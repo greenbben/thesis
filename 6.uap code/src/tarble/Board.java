@@ -74,17 +74,23 @@ public class Board {
 		return -1;
 	}
 	
-	public List<Pair<Pair<Integer, Integer>, Pair<Integer, Integer>>> getLegalMoves(int roll, int team) {
-		return getLegalMoves(roll, team, null);
+	// Returns a list of possible moves with a move being represented as a pair of pairs of start and end
+	// locations and list of taken pieces
+	public List<Pair<Pair<Pair<Integer, Integer>, Pair<Integer, Integer>>, List<Pair<Integer, Integer>>>> getLegalMoves(int roll, int team) {
+		return getLegalMoves(roll, team, null, new ArrayList<Pair<Integer, Integer>>());
 	}
 	
-	private List<Pair<Pair<Integer, Integer>, Pair<Integer, Integer>>> getLegalMoves(int roll, int team, Pair<Integer, Integer> origin) {
+	// Returns a list of possible moves with a move being represented as a pair of pairs of start and end
+	// locations and list of taken pieces. Uses origin to represent starting location
+	private List<Pair<Pair<Pair<Integer, Integer>, Pair<Integer, Integer>>, List<Pair<Integer, Integer>>>> 
+		getLegalMoves(int roll, int team, Pair<Integer, Integer> origin, List<Pair<Integer, Integer>> taken) {
 		Board copyBoard = new Board(new HashMap<Pair<Integer, Integer>, Integer>(pieces));
 		if (roll == 0) {
-			return new ArrayList<Pair<Pair<Integer, Integer>, Pair<Integer, Integer>>>();
+			return new ArrayList<Pair<Pair<Pair<Integer, Integer>, Pair<Integer, Integer>>, 
+					List<Pair<Integer, Integer>>>>();
 		}
-		List<Pair<Pair<Integer, Integer>, Pair<Integer, Integer>>> legalMoves = 
-				new ArrayList<Pair<Pair<Integer, Integer>, Pair<Integer, Integer>>>();
+		List<Pair<Pair<Pair<Integer, Integer>, Pair<Integer, Integer>>, List<Pair<Integer, Integer>>>> legalMoves = 
+				new ArrayList<Pair<Pair<Pair<Integer, Integer>, Pair<Integer, Integer>>, List<Pair<Integer, Integer>>>>();
 		for (Entry<Pair<Integer, Integer>, Integer> position : pieces.entrySet()) {
 			if (position.getValue() == team) {
 				for (int i = -1; i <= 1; ++i) {
@@ -94,12 +100,16 @@ public class Board {
 						}
 						int x = position.getKey().getFirst() + i;
 						int y = position.getKey().getSecond() + j;
+						List<Pair<Integer, Integer>> jumpLocations = new ArrayList<Pair<Integer, Integer>>();
 						// location taken
 						if (copyBoard.getPiece(new Pair<Integer, Integer>(x, y)) == team) {
 							continue;
+						// can jump
 						} else if (copyBoard.getPiece(new Pair<Integer, Integer>(x, y)) >= 0) {
+							jumpLocations.add(new Pair<Integer, Integer>(x, y));
 							x += i;
 							y += j;
+							// jump location taken
 							if (copyBoard.getPiece(new Pair<Integer, Integer>(x, y)) >= 0) {
 								continue;
 							}
@@ -107,15 +117,15 @@ public class Board {
 						if (copyBoard.isOnBoard(x, y) && roll > 1) {
 							copyBoard.move(position.getKey(), new Pair<Integer, Integer>(x, y));
 							if (origin == null) {
-								for (Pair<Pair<Integer, Integer>, Pair<Integer, Integer>> move : 
-										copyBoard.getLegalMoves(roll - 1, team, position.getKey())) {
+								for (Pair<Pair<Pair<Integer, Integer>, Pair<Integer, Integer>>, List<Pair<Integer, Integer>>> move : 
+										copyBoard.getLegalMoves(roll - 1, team, position.getKey(), Utility.merge(taken, jumpLocations))) {
 									if (!legalMoves.contains(move)) {
 										legalMoves.add(move);
 									}
 								}
 							} else {
-								for (Pair<Pair<Integer, Integer>, Pair<Integer, Integer>> move : 
-										copyBoard.getLegalMoves(roll - 1, team, position.getKey())) {
+								for (Pair<Pair<Pair<Integer, Integer>, Pair<Integer, Integer>>, List<Pair<Integer, Integer>>> move : 
+										copyBoard.getLegalMoves(roll - 1, team, position.getKey(), Utility.merge(taken, jumpLocations))) {
 									if (!legalMoves.contains(move)) {
 										legalMoves.add(move);
 									}
@@ -125,12 +135,12 @@ public class Board {
 						} else if (copyBoard.isOnBoard(x, y)) {
 							if (origin == null) {
 								legalMoves.add(
-										new Pair<Pair<Integer, Integer>, Pair<Integer, Integer>>(
-												position.getKey(), new Pair<Integer, Integer>(x, y)));
+										new Pair<Pair<Pair<Integer, Integer>, Pair<Integer, Integer>>, List<Pair<Integer, Integer>>>(
+												new Pair<Pair<Integer, Integer>, Pair<Integer, Integer>>(position.getKey(), new Pair<Integer, Integer>(x, y)), Utility.merge(taken, jumpLocations)));
 							} else {
 								legalMoves.add(
-										new Pair<Pair<Integer, Integer>, Pair<Integer, Integer>>(
-												origin, new Pair<Integer, Integer>(x, y)));
+										new Pair<Pair<Pair<Integer, Integer>, Pair<Integer, Integer>>, List<Pair<Integer, Integer>>>(
+												new Pair<Pair<Integer, Integer>, Pair<Integer, Integer>>(origin, new Pair<Integer, Integer>(x, y)), Utility.merge(taken, jumpLocations)));
 							}
 						}
 					}
