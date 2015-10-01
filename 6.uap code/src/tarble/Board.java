@@ -1,7 +1,6 @@
 package tarble;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +18,10 @@ public class Board {
 	
 	public Board(Map<Pair<Integer, Integer>, Integer> pieces) {
 		this.pieces = pieces;
+	}
+	
+	public Map<Pair<Integer, Integer>, Integer> getPieces() {
+		return pieces;
 	}
 	
 	// Check if a given coordinate is located on the board.

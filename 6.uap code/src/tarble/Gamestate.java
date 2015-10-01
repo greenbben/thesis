@@ -43,7 +43,6 @@ public class Gamestate {
 	// from:toxtaken for each piece moved and seperated by spaces
 	public void readNotation(String input) {
 		String[] inputArray = input.split(" ");
-		int roll = Integer.parseInt(inputArray[0]);
 		String[] moves = Arrays.copyOfRange(inputArray, 1, inputArray.length);
 		for (String move : moves) {
 			String from = move.split(":")[0];

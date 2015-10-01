@@ -7,43 +7,16 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 public class main extends Applet implements MouseListener {
 
-//	public static void main(String[] args) {
-//		/*Map<Pair<Integer, Integer>, Integer> pieces = new HashMap<Pair<Integer, Integer>, Integer>();
-//		pieces.put(new Pair<Integer, Integer>(-4, 5), 1);
-//		pieces.put(new Pair<Integer, Integer>(0, 2), 1);
-//		pieces.put(new Pair<Integer, Integer>(4, -4), 1);
-//		//pieces.put(new Pair<Integer, Integer>(4, -3), 2);
-//		pieces.put(new Pair<Integer, Integer>(4, -5), 2);
-//		pieces.put(new Pair<Integer, Integer>(0, -2), 2);
-//		pieces.put(new Pair<Integer, Integer>(0, 0), 0);
-//		Board board = new Board(pieces);*/
-//		
-//		
-//		Gamestate gamestate = new Gamestate();
-//		gamestate.getBoard().printBoard();
-//		Player randomPlayer = new RandomPlayer(gamestate, 1);
-//		//System.out.println(randomPlayer.chooseMove(2));
-//		long x=System.currentTimeMillis();
-//		System.out.println(gamestate.getBoard().getLegalMoves(6, 1).size());
-//		System.out.println(System.currentTimeMillis()-x);
-//		/*board.printBoard();
-//		gamestate.readNotation("4 -4,5:1,3 0,2:0,-1x0,0");
-//		board.printBoard();
-//		System.out.println(gamestate.getScore(1));
-//		System.out.println(gamestate.getScore(2));*/
-//	}
 	private static final int MAX = Integer.MAX_VALUE;
 	private final int cols = 11;
 	private final int rows = 11;
 	private int boardSize, xCenter, yCenter;
 	private Pair<Integer, Integer> filled;
 	private Map<Integer, Color>  teamColors;
-	private Map<Pair<Integer, Integer>, Integer> internalBoard;
-	private Map<Integer, Map<Integer, Integer>> appletBoard;
+	private Board board;
 	
 	public void init() {
 		boardSize = Math.min(this.getWidth(), this.getHeight());
@@ -52,45 +25,57 @@ public class main extends Applet implements MouseListener {
 		this.addMouseListener(this);
 		filled = new Pair<Integer, Integer>(MAX, MAX);
 		teamColors = new HashMap<Integer, Color>();
-		teamColors.put(0, Color.BLUE);
+		teamColors.put(0, Color.BLACK);
 		teamColors.put(1, Color.RED);
-		teamColors.put(2, Color.GREEN);
+		teamColors.put(2, Color.BLUE);
+		
+		board = Gamestate.setUpBoard();
 	}
 	
 	public void paint(Graphics g) {
 		boardSize = Math.min(this.getWidth(), this.getHeight());
 		xCenter = this.getWidth() / 2;
 		yCenter = this.getHeight() / 2;
-		Map<Integer, Map<Integer, Integer>> pieces = new HashMap<Integer, Map<Integer, Integer>>();
-		Map<Integer, Integer> row0 = new HashMap<Integer, Integer>();
-		row0.put(0, 1);
-		pieces.put(0, row0);
-		drawBoard(g, rows, cols, boardSize, xCenter, yCenter, filled, pieces);
+//		Map<Integer, Map<Integer, Integer>> pieces = new HashMap<Integer, Map<Integer, Integer>>();
+//		Map<Integer, Integer> row0 = new HashMap<Integer, Integer>();
+//		row0.put(1, 1);
+//		pieces.put(3, row0);
+		drawBoard(g, rows, cols, boardSize, xCenter, yCenter, filled, convertBoard(board.getPieces()));
 	}
 	
 	/**
 	 * Does not support even number of rows
+	 * 
+	 * @param pieces Pieces is a map from a row number to a map from a column number to the team.
 	 */
 	private void drawBoard(Graphics g, int rows, int cols, int size, 
 			int xcenter, int ycenter, Pair<Integer, Integer> filled, 
 			Map<Integer, Map<Integer, Integer>> pieces) {
 		int rowHeight = size / rows;
-		 for (int i = -rows / 2; i < rows / 2 + 1; ++i) {
-			 int fillCol = MAX;
-			 if (filled.getSecond() == i) {
-				 fillCol = adjustCol(filled.getFirst(), i);
-			 }
-			 if (pieces.containsKey(i)) {
-				 drawRow(g, cols - Math.abs(i), size - rowHeight * Math.abs(i), 
-						 xcenter, ycenter - i * rowHeight * 3 / 4, fillCol, pieces.get(i), i);
-			 } else {
-				 drawRow(g, cols - Math.abs(i), size - rowHeight * Math.abs(i), 
-						 xcenter, ycenter - i * rowHeight * 3 / 4, fillCol);
-			 }
-		 }
+		for (int i = -rows / 2; i < rows / 2 + 1; ++i) {
+			int fillCol = MAX;
+			if (filled.getSecond() == i) {
+				fillCol = adjustFillCol(filled.getFirst(), i);
+			}
+			if (pieces.containsKey(i)) {
+				drawRow(g, cols - Math.abs(i), size - rowHeight * Math.abs(i), 
+						xcenter, ycenter - i * rowHeight * 3 / 4, fillCol, pieces.get(i), i);
+			} else {
+				drawRow(g, cols - Math.abs(i), size - rowHeight * Math.abs(i), 
+						xcenter, ycenter - i * rowHeight * 3 / 4, fillCol);
+			}
+		}
 	}
 	
 	private int adjustCol(int col, int row) {
+		int ret = col + row / 2;
+		if (row < 0) {
+			ret += row % 2;
+		}
+		return ret + (((row - (row < 0 ? 1 : 0)) / 2) * -2);
+	}
+	
+	private int adjustFillCol(int col, int row) {
 		int ret = col + row / 2;
 		if (row < 0) {
 			ret += row % 2;
@@ -219,13 +204,15 @@ public class main extends Applet implements MouseListener {
 	
 	private Map<Integer, Map<Integer, Integer>> convertBoard(
 			Map<Pair<Integer, Integer>, Integer> oldBoard) {
+		System.out.println(oldBoard);
 		Map<Integer, Map<Integer, Integer>> ret = new HashMap<Integer, Map<Integer, Integer>>();
-		for (int i = -(rows / 2); i < rows / 2; ++i) {
+		for (int i = -(rows / 2); i <= rows / 2; ++i) {
 			ret.put(i, new HashMap<Integer, Integer>());
 		}
 		for (Pair<Integer, Integer> place : oldBoard.keySet()) {
 			ret.get(place.getSecond()).put(place.getFirst(), oldBoard.get(place));
 		}
+		System.out.println(ret);
 		return ret;
 	}
 }
