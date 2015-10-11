@@ -1,0 +1,26 @@
+team1:[600, 700, 800, 900, 601, 701, 801]0,team2:[110, 210, 310, 410, 209, 309, 409]0,neutral:true,2,true
+team1:[800, 801, 900, 500, 601, 700, 701]0,team2:[110, 210, 310, 410, 209, 309, 409]0,neutral:true,1,true
+team1:[800, 801, 601, 700, 701]0,team2:[110, 210, 310, 410, 209, 309, 409]0,neutral:true,4,false
+team1:[800, 801, 601, 700, 701]0,team2:[210, 309, 310, 409, 410, 109, 110]0,neutral:true,3,false
+team1:[800, 801, 601, 700, 701]0,team2:[210, 309, 310, 409, 410, 10, 110]0,neutral:true,2,false
+team1:[800, 801, 601, 700, 701]0,team2:[210, 309, 310, 410, 10, 509, 110]0,neutral:true,1,false
+team1:[800, 801, 601, 700, 701]0,team2:[210, 309, 310, 410, 110]0,neutral:true,6,true
+team1:[800, 801, 501, 700, 701]0,team2:[210, 309, 310, 410, 110]0,neutral:true,5,true
+team1:[800, 801, 500, 700, 701]0,team2:[210, 309, 310, 410, 110]0,neutral:true,4,true
+team1:[800, 500, 901, 700, 701]0,team2:[210, 309, 310, 410, 110]0,neutral:true,3,true
+team1:[800, 500, 1000, 700, 701]0,team2:[210, 309, 310, 410, 110]0,neutral:true,2,true
+team1:[800, 801, 500, 1000, 700]0,team2:[210, 309, 310, 410, 110]0,neutral:true,1,true
+team1:[800, 901, 700]0,team2:[210, 309, 310, 410, 110]0,neutral:true,4,false
+team1:[800, 901, 700]0,team2:[210, 309, 310, 410, 10]0,neutral:true,3,false
+team1:[800, 901, 700]0,team2:[210, 309, 310, 10, 510]0,neutral:true,2,false
+team1:[800, 901, 700]0,team2:[210, 309, 10, 410, 510]0,neutral:true,1,false
+team1:[800, 901, 700]0,team2:[309, 410, 110]0,neutral:true,3,true
+team1:[800, 901, 600]0,team2:[309, 410, 110]0,neutral:true,2,true
+team1:[800, 500, 901]0,team2:[309, 410, 110]0,neutral:true,1,true
+team1:[800]0,team2:[309, 410, 110]0,neutral:true,4,false
+team1:[800]0,team2:[309, 410, 10]0,neutral:true,3,false
+team1:[800]0,team2:[409, 410, 10]0,neutral:true,2,false
+team1:[800]0,team2:[410, 10, 509]0,neutral:true,1,false
+team1:[800]0,team2:[410]0,neutral:true,2,true
+team1:[900]0,team2:[410]0,neutral:true,1,true
+team1:[]0,team2:[410]0,neutral:true,1,false
