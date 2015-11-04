@@ -208,7 +208,7 @@ class GamestateUtils {
 				true,
 				0,
 				0,
-				true,
+				false,
 				new Random().nextInt(Constants.MAX_ROLL) + 1);
 	}
 }

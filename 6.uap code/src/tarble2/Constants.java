@@ -20,4 +20,6 @@ class Constants {
 	static final int COLS = 11;
 	
 	static final String GAME_DIR = "/home/greenbben/Documents/thesis/6.Uap extra/games/game.txt";
+	
+	static final long MOVE_MILLIS = 10000;
 }

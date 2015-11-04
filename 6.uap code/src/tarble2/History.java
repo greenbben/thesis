@@ -9,6 +9,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 class History {
 
@@ -25,12 +26,11 @@ class History {
 		}
 	}
 	
-	static Collection<Gamestate> readHistory(String filename) {
+	static List<Gamestate> readHistory(String filename) {
 		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(Constants.GAME_DIR), "utf-8"))) {
 			String line;
-			Collection<Gamestate> states = new ArrayList<Gamestate>();
+			List<Gamestate> states = new ArrayList<Gamestate>();
 		    while ((line = reader.readLine()) != null) {
-		    	System.out.println(line);
 		    	states.add(Gamestate.deserialize(line));
 		    }
 		    return states;

@@ -10,21 +10,50 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
+import javax.mail.Message;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import javax.swing.JOptionPane;
 
 public class main extends Applet implements MouseListener {
 	// Set to true in order to record game.
 	private final boolean collectGameData = true;
+	private final int compTeam = 2;
 	
 	private Gamestate state;
 	private int filled;
 	private int boardSize, xCenter, yCenter;
 	private Map<Integer, Color>  teamColors;
+	private Player compPlayer;
 	
 	Collection<Gamestate> history = new ArrayList<Gamestate>();
 	
 	public void init() {
+//		String host = "localhost";
+//		Properties props = System.getProperties();
+//		props.setProperty("mail.smtp.host", host);
+//		Session session = Session.getDefaultInstance(props);
+//		String msgBody = "Hello World";
+//		try {
+//			Message msg = new MimeMessage(session);
+//			msg.setFrom(new InternetAddress("greenbben@gmail.com"));
+//            msg.addRecipient(Message.RecipientType.TO,
+//                             new InternetAddress("bengreen@mit.edu"));
+//            msg.setSubject("Tarble has been played");
+//            msg.setText(msgBody);
+//            Transport.send(msg);
+//
+//        } catch (Exception e) {
+//            throw new RuntimeException(e.getMessage());
+//        }
+		
+		
+		compPlayer = new MonteCarloPlayer();
 		boardSize = Math.min(this.getWidth(), this.getHeight());
 		xCenter = this.getWidth() / 2;
 		yCenter = this.getHeight() / 2;
@@ -54,6 +83,7 @@ public class main extends Applet implements MouseListener {
 			if (winner == -1) {
 				JOptionPane.showMessageDialog(this, "The game has ended in a tie.");
 			}
+			System.out.println("winner");
 			JOptionPane.showMessageDialog(this, (winner == 1 ? "Red" : "Blue") + " wins!!!");
 			if (collectGameData) {
 				History.writeHistory(history, Constants.GAME_DIR);
@@ -61,6 +91,15 @@ public class main extends Applet implements MouseListener {
 			System.exit(202);
 		}
 		drawBoard(g, boardSize, xCenter, yCenter, filled, state);
+		if (compTeam == 1 && state.isPlayer1Turn() || compTeam == 2 && !state.isPlayer1Turn()) {
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e.getMessage());
+			}
+			move(compPlayer.nextMove(state));
+			repaint();
+		}
 	}
 	
 	/**
@@ -138,6 +177,12 @@ public class main extends Applet implements MouseListener {
 		return (((ret + (((row - (row < 0 ? 1 : 0)) / 2) * -2)) + 5) * 100) + row + 5;
 	}
 	
+	private void move(Gamestate move) {
+		state = move;
+		history.add(move);
+		filled = Integer.MAX_VALUE;
+	}
+	
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		// Find clicked location.
@@ -159,8 +204,8 @@ public class main extends Applet implements MouseListener {
 			
 		if (filled == Integer.MAX_VALUE) {
 			// Only set filled if the clicked location is a valid location for the moving player.
-			if ((state.isPlayer1Turn() && state.getTeam1().contains(clicked)) 
-					|| (!state.isPlayer1Turn() && state.getTeam2().contains(clicked))) {
+			if ((state.isPlayer1Turn() && state.getTeam1().contains(clicked) && compTeam != 1) 
+					|| (!state.isPlayer1Turn() && state.getTeam2().contains(clicked) && compTeam != 2)) {
 				filled = clicked;
 			} else {
 				System.out.println((state.isPlayer1Turn() ? "player 1" : "player 2") + " does not have a piece at " + clicked);
@@ -170,9 +215,7 @@ public class main extends Applet implements MouseListener {
 			Gamestate move = GamestateUtils.move(state, filled, clicked);
 			if (GamestateUtils.isLegalMove(state, move)) {
 				// Successful move.
-				state = move;
-				history.add(move);
-				filled = Integer.MAX_VALUE;
+				move(move);
 			} else {
 				// Illegal move.
 				System.out.println("not a legal move");

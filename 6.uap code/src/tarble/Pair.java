@@ -1,8 +1,8 @@
 package tarble;
 
 public class Pair<S, T> {
-	private final S first;
-	private final T second;
+	private S first;
+	private T second;
 	
 	public Pair(S first, T second) {
 		this.first = first;
@@ -15,6 +15,14 @@ public class Pair<S, T> {
 	
 	public T getSecond() {
 		return second;
+	}
+	
+	public void setFirst(S value) {
+		first = value;
+	}
+	
+	public void setSecond(T value) {
+		second = value;
 	}
 	
 	
