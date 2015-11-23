@@ -13,7 +13,18 @@ import java.util.Map;
 
 import javax.swing.JOptionPane;
 
-public class PVP extends Applet implements MouseListener {
+public class Situation extends Applet implements MouseListener {
+	// Array of situations to study.
+	private final String[] situations = {"team1:[600, 700, 800, 900, 601, 701, 801]0,team2:[110, 210, 310, 410, 209, 309, 409]0,neutral:true,6,false",
+			"team1:[800, 801, 900, 406, 503, 700, 702]5,team2:[308, 408]1,neutral:true,6,false",
+			"team1:[601, 509]6,team2:[209]7,neutral:true,1,true",
+			"team1:[410, 601, 704]6,team2:[307, 506]5,neutral:true,6,false",
+			"team1:[800, 504, 601, 900]5,team2:[508, 409, 110, 210]4,neutral:true,2,true",
+			"team1:[702, 703, 504, 603, 503, 602, 604]0,team2:[307, 408, 308, 506, 507, 406, 407]0,neutral:true,6,false"};
+	
+	// The situation being used for this example. Change to study different situation.
+	private final int choice = 1;
+	
 	// Set to true in order to record game.
 	private final boolean collectGameData = true;
 	
@@ -21,6 +32,7 @@ public class PVP extends Applet implements MouseListener {
 	private int filled;
 	private int boardSize, xCenter, yCenter;
 	private Map<Integer, Color>  teamColors;
+	private Gamestate initialState = Gamestate.deserialize(situations[choice]);
 	
 	Collection<Gamestate> history = new ArrayList<Gamestate>();
 	
@@ -28,7 +40,7 @@ public class PVP extends Applet implements MouseListener {
 		boardSize = Math.min(this.getWidth(), this.getHeight());
 		xCenter = this.getWidth() / 2;
 		yCenter = this.getHeight() / 2;
-		state = GamestateUtils.getStartingGamestate();
+		state = initialState;
 		history.add(state);
 		teamColors = new HashMap<Integer, Color>();
 		teamColors.put(0, Color.BLACK);
@@ -50,14 +62,14 @@ public class PVP extends Applet implements MouseListener {
 		g.drawString("Red: " + state.getScore1(), xCenter / 100, yCenter / 100 + 3 * boardSize / 20);
 		g.drawString("Blue: " + state.getScore2(), xCenter / 100, yCenter / 100 + boardSize / 5);
 		int winner = GamestateUtils.getWinner(state);
-		if (winner != 0) {
-			if (winner == -1) {
-				JOptionPane.showMessageDialog(this, "The game has ended in a tie.");
-			}
-			System.out.println("winner");
-			JOptionPane.showMessageDialog(this, (winner == 1 ? "Red" : "Blue") + " wins!!!");
+		if (state.isPlayer1Turn() != initialState.isPlayer1Turn()) {
+//			if (winner == -1) {
+//				JOptionPane.showMessageDialog(this, "The game has ended in a tie.");
+//			}
+//			System.out.println("winner");
+//			JOptionPane.showMessageDialog(this, (winner == 1 ? "Red" : "Blue") + " wins!!!");
 			if (collectGameData) {
-				History.writeHistory(history, Constants.GAME_DIR);
+				History.writeHistory(history, Constants.GAME_DIR + "situations/");
 			}
 			System.exit(202);
 		}
