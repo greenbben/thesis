@@ -8,7 +8,7 @@ import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
 
-class GamestateUtils {
+public class GamestateUtils {
 	
 	static Collection<Gamestate> generateNextMove(Gamestate state) {
 		Set<Integer> player;

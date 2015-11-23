@@ -6,6 +6,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -51,7 +52,6 @@ public class main extends Applet implements MouseListener {
 //        } catch (Exception e) {
 //            throw new RuntimeException(e.getMessage());
 //        }
-		
 		
 		compPlayer = new MonteCarloPlayer();
 		boardSize = Math.min(this.getWidth(), this.getHeight());

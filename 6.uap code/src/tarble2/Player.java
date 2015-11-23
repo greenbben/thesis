@@ -1,5 +1,5 @@
 package tarble2;
 
-interface Player {
+public interface Player {
 	Gamestate nextMove(Gamestate state);
 }

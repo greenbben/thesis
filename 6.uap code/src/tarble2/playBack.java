@@ -35,7 +35,7 @@ public class playBack extends Applet implements ActionListener {
 		teamColors.put(0, Color.BLACK);
 		teamColors.put(1, Color.RED);
 		teamColors.put(2, Color.BLUE);
-		history = History.readHistory(Constants.GAME_DIR);
+		history = History.readHistory(Constants.GAME_DIR + "game.txt");
 	}
 	
 	public void paint(Graphics g) {

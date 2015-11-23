@@ -12,7 +12,7 @@ import java.util.Set;
  * 1 and 2 represent the scores of the two respective teams. The boolean neutral variable represents whether
  * or not the neutral center piece is still located in the center of the board.
  */
-final class Gamestate {
+public final class Gamestate {
 	final Set<Integer> team1;
 	final Set<Integer> team2;
 	final boolean neutral;
