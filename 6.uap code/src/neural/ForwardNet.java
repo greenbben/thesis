@@ -1,7 +1,22 @@
 package neural;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.regex.Pattern;
+
 import org.jblas.DoubleMatrix;
 import org.jblas.MatrixFunctions;
+
+import tarble2.Gamestate;
 
 public class ForwardNet {
 	DoubleMatrix[] weights;
@@ -133,5 +148,41 @@ public class ForwardNet {
 			sum += MatrixFunctions.pow(2, i).sum();
 		}
 		return loss(finalOutput, expectedOutput) + lambda * sum;
+	}
+	
+	public void serializeWeights(String fileName) {
+		try (Writer writer = new BufferedWriter(new OutputStreamWriter(
+	              new FileOutputStream("/home/greenbben/Documents/thesis/6.Uap extra/weights/" + fileName + ".txt"), "utf-8"))) {
+			for (DoubleMatrix weight : weights) {
+				writer.write(weight.rows + "|" + weight.columns + "|" + weight + "\n");
+			}
+		} catch (Exception e) {
+			throw new RuntimeException("Could not write history.");
+		}
+	}
+	
+	public static ForwardNet deserializeWeights(String fileName) {
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(
+				"/home/greenbben/Documents/thesis/6.Uap extra/weights/" + fileName + ".txt"), "utf-8"))) {
+			String line;
+			Collection<DoubleMatrix> weights = new ArrayList<>();
+		    while ((line = reader.readLine()) != null) {
+		    	String[] firstSplit = line.split(Pattern.quote("|"));
+		    	String[] rowSplit = firstSplit[2]
+		    			.replaceAll(Pattern.quote("[") + "|" + Pattern.quote(" ") + "|" + Pattern.quote("]"), "")
+		    			.split(";");
+		    	double[][] weightArray = new double[rowSplit.length][rowSplit[0].split(",").length];
+		    	for (int i = 0; i < rowSplit.length; ++i) {
+		    		String[] row = rowSplit[i].split(",");
+		    		for (int j = 0; j < row.length; ++j) {
+		    			weightArray[i][j] = Double.parseDouble(row[j]);
+		    		}
+		    	}
+		    	weights.add(new DoubleMatrix(weightArray));
+		    }
+		    return new ForwardNet(weights.toArray(new DoubleMatrix[weights.size()]));
+		} catch (Exception e) {
+			throw new RuntimeException(e.getMessage());
+		}
 	}
 }

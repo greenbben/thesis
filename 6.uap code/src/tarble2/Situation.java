@@ -23,7 +23,7 @@ public class Situation extends Applet implements MouseListener {
 			"team1:[702, 703, 504, 603, 503, 602, 604]0,team2:[307, 408, 308, 506, 507, 406, 407]0,neutral:true,6,false"};
 	
 	// The situation being used for this example. Change to study different situation.
-	private final int choice = 1;
+	private final int choice = 2;
 	
 	// Set to true in order to record game.
 	private final boolean collectGameData = true;
