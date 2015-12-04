@@ -22,6 +22,7 @@ public class ForwardNet {
 	DoubleMatrix[] weights;
 	
 	private final DoubleMatrix negOne = new DoubleMatrix(1,1,-1);
+	private DoubleMatrix[] weightRowRemovers;
 	
 	/**
 	 * Initial Weights is a float matrix representing the weights to
@@ -37,6 +38,11 @@ public class ForwardNet {
 	 */
 	public ForwardNet(DoubleMatrix[] initialWeights) {
 		weights = initialWeights;
+		weightRowRemovers = new DoubleMatrix[weights.length];
+		for (int i = 0; i < weightRowRemovers.length; ++i) {
+			weightRowRemovers[i] = DoubleMatrix.concatHorizontally(
+					DoubleMatrix.zeros(weights[i].rows - 1), DoubleMatrix.eye(weights[i].rows - 1));
+		}
 	}
 	
 	/**
@@ -85,6 +91,35 @@ public class ForwardNet {
 		return weights;
 	}
 	
+	/**
+	 * Updates the weigths after he conclusion of a game. 
+	 * 
+	 * @param history An array of the input matrix to forward propagation
+	 * at each point of the game. The first element is after the first move made by the first player, and the last element
+	 * is the final state of the game in which one of the players has been declared the winner.
+	 * @param winner The expected output by the final input in which one of the players has been declared the winner.
+	 * @param learningRate A number between 0 and 1 representing how much the weights are updated.
+	 * @param lambda A number between 0 and 1 representing how much weight early moves in the game are given towards a
+	 * winning strategy. 0 means none and 1 means they are as important as the last move. Numbers in between 0 and 1 represent
+	 * a decay of importance with time.
+	 * @return The new updated weights array.
+	 */
+	public DoubleMatrix[] TDUpdate(Collection<DoubleMatrix> history, double winner, double learningRate, double lambda) {
+		DoubleMatrix[] gradientSum = new DoubleMatrix[weights.length];
+		for (int i = 0; i < gradientSum.length; ++i) {
+			gradientSum[i] = DoubleMatrix.zeros(weights[i].rows, weights[i].columns);
+		}
+		for (DoubleMatrix inputs : history) {
+			DoubleMatrix[] outputs = forwardProp(inputs);
+			DoubleMatrix[] gradients = nonLossWeightGradients(outputs);
+			for (int i = 0; i < weights.length; ++i) {
+				gradientSum[i] = gradientSum[i].mul(lambda).add(gradients[i]);
+				weights[i] = weights[i].add(gradientSum[i].mul(winner - outputs[outputs.length - 1].sum()));
+			}
+		}
+		return weights;
+	}
+	
 	private DoubleMatrix sigmoid(DoubleMatrix z) {
 		return MatrixFunctions.pow(MatrixFunctions.exp(z.neg()).add(1), -1);
 	}
@@ -119,6 +154,33 @@ public class ForwardNet {
 		for (int i = 0; i < gradients.length; ++i) {
 			gradients[i] = deltas[i].mmul(DoubleMatrix.concatHorizontally(negOne, outputs[i]))
 					.transpose();
+		}
+		return gradients;
+	}
+	
+//	/**
+//	 * Returns the non-Loss delta values for weight gradients.
+//	 * 
+//	 * @param outputs The result of calling forwardProp with the current weights.
+//	 * @return An array of delta column vectors where the size of the array is the number of layers in
+//	 * the net and the size of the vector is equal to the number of neurons in the layer.
+//	 */
+//	private DoubleMatrix[] nonLossDeltas(DoubleMatrix[] outputs) {
+//		DoubleMatrix[] deltas = new DoubleMatrix[weights.length];
+//		deltas[deltas.length - 1] = outputs[outputs.length - 1].mul(outputs[outputs.length - 1].sub(1).neg());
+//		
+//	}
+	
+	public DoubleMatrix[] nonLossWeightGradients(DoubleMatrix[] outputs) {
+		DoubleMatrix[] gradients = new DoubleMatrix[weights.length];
+		
+		// First iteration is hard coded in because it is different than future iterations.
+		DoubleMatrix delta = outputs[outputs.length - 1].mul(outputs[outputs.length - 1].sub(1).neg()).transpose();
+		gradients[gradients.length - 1] = DoubleMatrix.concatHorizontally(negOne, outputs[gradients.length - 1]).transpose().mmul(delta.transpose());
+		for (int i = gradients.length - 2; i >= 0; --i) {
+			delta = weightRowRemovers[i + 1].mmul(weights[i + 1]).mmul(delta).mul(outputs[i + 1].mul(outputs[i + 1].sub(1).neg()));
+			System.out.println("delta: " + delta);
+			gradients[i] = DoubleMatrix.concatHorizontally(negOne, outputs[i]).transpose().mmul(delta.transpose());
 		}
 		return gradients;
 	}

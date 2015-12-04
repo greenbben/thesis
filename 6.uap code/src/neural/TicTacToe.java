@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.jblas.DoubleMatrix;
+
 public class TicTacToe {
 	// 2D array representing board state. 0 is empty, 1 is X 2 is O.
 	int[][] state = new int[3][3];
@@ -72,12 +74,30 @@ public class TicTacToe {
 					if (player1Turn) {
 						newState[i][j] = 1;
 					} else {
-						newState[i][j] = 2;
+						newState[i][j] = -1;
 					}
 					moves.add(newState);
 				}
 			}
 		}
 		return moves;	
+	}
+	
+	public int getPlayerMultiplier() {
+		return player1Turn ? 1 : -1;
+	}
+	
+	static DoubleMatrix boardToInputs(int[][] state, int playerMultiplier) {
+		return new DoubleMatrix(1, 10, 
+				state[0][0], 
+				state[1][0], 
+				state[2][0],
+				state[0][1],
+				state[1][1],
+				state[2][1],
+				state[0][2],
+				state[1][2],
+				state[2][2],
+				playerMultiplier);
 	}
 }
