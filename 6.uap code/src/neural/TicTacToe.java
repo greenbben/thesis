@@ -28,34 +28,39 @@ public class TicTacToe {
 		return state;
 	}
 	
-	// Returns 0 if no winner yet, otherwise the number of the winning team. -1 if the game is a tie.
+	// Returns -10 if no winner yet, otherwise the number of the winning team. 0 if the game is a tie.
 	public int winner() {
 		// 3 in a row in a row.
 		for (int i = 0; i < state.length; ++i) {
-			if (state[i][0] == state[i][1] && state[i][1] == state[i][2]) {
+			if (state[i][0] == state[i][1] && state[i][1] == state[i][2] && state[i][0] != 0) {
 				return state[i][0];
 			}
 		}
 		
 		// 3 in a row in a column.
 		for (int i = 0; i < state[0].length; ++i) {
-			if (state[0][i] == state[1][i] && state[1][i] == state[2][i]) {
+			if (state[0][i] == state[1][i] && state[1][i] == state[2][i] && state[0][i] != 0) {
 				return state[0][i];
 			}
 		}
 		
 		// 3 in a row diagonally.
-		if (state[0][0] == state[1][1] && state[1][1] == state[2][2]) {
+		if (state[0][0] == state[1][1] && state[1][1] == state[2][2] && state[0][0] != 0) {
 			return state[0][0];
-		} else if (state[0][2] == state[1][1] && state[1][1] == state[2][0]) {
+		} else if (state[0][2] == state[1][1] && state[1][1] == state[2][0] && state[0][2] != 0) {
 			return state[0][2];
 		}
 		
-		// Tie.
-		if (this.getLegalMoves().size() == 0) {
-			return -1;
+		// Keep Going.
+		for (int i = 0; i < state.length; ++i) {
+			for (int j = 0; j < state[i].length; ++j) {
+				if (state[i][j] == 0) {
+					return -10;
+				}
+			}
 		}
 		
+		// Tie
 		return 0;
 	}
 	
@@ -99,5 +104,41 @@ public class TicTacToe {
 				state[1][2],
 				state[2][2],
 				playerMultiplier);
+	}
+	
+	// Returns -10 if no winner yet, otherwise the number of the winning team. 0 if the game is a tie.
+	static int winner(int[][] state) {
+		// 3 in a row in a row.
+		for (int i = 0; i < state.length; ++i) {
+			if (state[i][0] == state[i][1] && state[i][1] == state[i][2] && state[i][0] != 0) {
+				return state[i][0];
+			}
+		}
+		
+		// 3 in a row in a column.
+		for (int i = 0; i < state[0].length; ++i) {
+			if (state[0][i] == state[1][i] && state[1][i] == state[2][i] && state[0][i] != 0) {
+				return state[0][i];
+			}
+		}
+		
+		// 3 in a row diagonally.
+		if (state[0][0] == state[1][1] && state[1][1] == state[2][2] && state[0][0] != 0) {
+			return state[0][0];
+		} else if (state[0][2] == state[1][1] && state[1][1] == state[2][0] && state[0][2] != 0) {
+			return state[0][2];
+		}
+		
+		// Keep Going.
+		for (int i = 0; i < state.length; ++i) {
+			for (int j = 0; j < state[i].length; ++j) {
+				if (state[i][j] == 0) {
+					return -10;
+				}
+			}
+		}
+		
+		// Tie
+		return 0;
 	}
 }

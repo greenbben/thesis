@@ -9,8 +9,10 @@ import org.jblas.MatrixFunctions;
 public class main {
 	
 	public static void main(String[] args) {
-//		DoubleMatrix[] weights = {new DoubleMatrix(3,2,-15,5,-10,10,-10,10), new DoubleMatrix(new double[][] {{15}, {10}, {10}})};
-//		System.out.println(weights[1].mul(new DoubleMatrix(new double[][] {{10, 10, 10}})).rows);
+		DoubleMatrix[] weights = {new DoubleMatrix(3,2,-15,5,-10,10,-10,10), new DoubleMatrix(new double[][] {{15}, {10}, {10}})};
+		System.out.println(weights[1]);
+		weights[1].put(2, 0, 3);
+		System.out.println(weights[1]);
 //		for (DoubleMatrix i : weights) {
 //			System.out.println(i.rows + "|" + i.columns + "|" + i);
 //		}
@@ -48,8 +50,13 @@ public class main {
 //		DoubleMatrix[] gradients = net.nonLossWeightGradients(outs);
 //		System.out.println(gradients[0]);
 //		System.out.println(gradients[1]);
+//		int hiddenNodes = 3;
+//		DoubleMatrix[] initialWeights = {DoubleMatrix.rand(11, hiddenNodes).mul(2).sub(1), DoubleMatrix.rand(hiddenNodes + 1, 1)};
+//		System.out.println(initialWeights[0]);
+//		int i = 000;
+//		if (i % 1000 == 0) {
+//			System.out.println("hello");
+//		}
 		
-		DoubleMatrix singleton = new DoubleMatrix(new double [][] {{3}});
-		System.out.println(Double.NEGATIVE_INFINITY * -1);
 	}
 }

@@ -114,8 +114,56 @@ public class ForwardNet {
 			DoubleMatrix[] gradients = nonLossWeightGradients(outputs);
 			for (int i = 0; i < weights.length; ++i) {
 				gradientSum[i] = gradientSum[i].mul(lambda).add(gradients[i]);
-				weights[i] = weights[i].add(gradientSum[i].mul(winner - outputs[outputs.length - 1].sum()));
+				weights[i] = weights[i].add(gradientSum[i].mul(learningRate * (winner - outputs[outputs.length - 1].sum())));
 			}
+		}
+		return weights;
+	}
+	
+	public DoubleMatrix[] TDUpdateStep(List<DoubleMatrix> history, double winner, double learningRate, double lambda) {
+		DoubleMatrix[][] gradientSum = new DoubleMatrix[history.size()][weights.length];
+		DoubleMatrix[][] outputs = new DoubleMatrix[history.size()][weights.length + 1];
+		int finalOutput = weights.length;
+		int finalStep = history.size() - 1;
+		// First update.
+		outputs[0] = forwardProp(history.get(0));
+		gradientSum[0] = nonLossWeightGradients(outputs[0]);
+		
+		// Middle updates.
+		for (int i = 0; i < history.size() - 1; ++i) {
+			outputs[i + 1] = forwardProp(history.get(i + 1));
+			DoubleMatrix[] gradients = nonLossWeightGradients(outputs[i + 1]);
+			for (int j = 0; j < weights.length; ++j) {
+				gradientSum[i + 1][j] = gradientSum[i][j].mul(lambda).add(gradients[j]);
+				weights[j] = weights[j].add(gradientSum[i][j].mul(learningRate * (outputs[i + 1][finalOutput].sum() - outputs[i][finalOutput].sum())));
+			}
+		}
+		
+		// Final update.
+		for (int j = 0; j < weights.length; ++j) {
+			weights[j] = weights[j].add(gradientSum[finalStep][j].mul(learningRate * (winner - outputs[finalStep][finalOutput].sum())));
+		}
+		
+		return weights;
+	}
+	
+	public DoubleMatrix[] TDSingleUpdate(List<DoubleMatrix> history, double winner, double learningRate, double lambda) {
+		// Find the temporal difference sum of the gradients.
+		DoubleMatrix[] gradientSum = new DoubleMatrix[weights.length];
+		for (int i = 0; i < gradientSum.length; ++i) {
+			gradientSum[i] = DoubleMatrix.zeros(weights[i].rows, weights[i].columns);
+		}
+		for (DoubleMatrix inputs : history) {
+			DoubleMatrix[] outputs = forwardProp(inputs);
+			DoubleMatrix[] gradients = nonLossWeightGradients(outputs);
+			for (int i = 0; i < weights.length; ++i) {
+				gradientSum[i] = gradientSum[i].mul(lambda).add(gradients[i].mul(learningRate * (winner - outputs[outputs.length - 1].sum())));
+			}
+		}
+		
+		// Update the weights.
+		for (int i = 0; i < weights.length; ++i) {
+			weights[i] = weights[i].add(gradientSum[i]);
 		}
 		return weights;
 	}
@@ -179,7 +227,6 @@ public class ForwardNet {
 		gradients[gradients.length - 1] = DoubleMatrix.concatHorizontally(negOne, outputs[gradients.length - 1]).transpose().mmul(delta.transpose());
 		for (int i = gradients.length - 2; i >= 0; --i) {
 			delta = weightRowRemovers[i + 1].mmul(weights[i + 1]).mmul(delta).mul(outputs[i + 1].mul(outputs[i + 1].sub(1).neg()));
-			System.out.println("delta: " + delta);
 			gradients[i] = DoubleMatrix.concatHorizontally(negOne, outputs[i]).transpose().mmul(delta.transpose());
 		}
 		return gradients;

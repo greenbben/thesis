@@ -6,22 +6,15 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
-
-import javax.mail.Message;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 import javax.swing.JOptionPane;
 
-public class main extends Applet implements MouseListener {
+import neural.ForwardNet;
+
+public class PlayNeuralNet extends Applet implements MouseListener {
 	// Set to true in order to record game.
 	private final boolean collectGameData = true;
 	private final int compTeam = 2;
@@ -35,7 +28,7 @@ public class main extends Applet implements MouseListener {
 	Collection<Gamestate> history = new ArrayList<Gamestate>();
 	
 	public void init() {		
-		compPlayer = new MonteCarloPlayer();
+		compPlayer = new NeuralTarblePlayer(ForwardNet.deserializeWeights("tarble_180000_1_layer_50_hiddenNodes_alpha=0.001_lambda=0.9"));
 		boardSize = Math.min(this.getWidth(), this.getHeight());
 		xCenter = this.getWidth() / 2;
 		yCenter = this.getHeight() / 2;

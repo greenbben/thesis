@@ -139,4 +139,8 @@ public final class Gamestate {
 		}
 		return false;
 	}
+	
+	int getPlayerMultiplier() {
+		return player1Turn ? 1 : -1;
+	}
 }

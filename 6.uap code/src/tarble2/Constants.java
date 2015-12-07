@@ -22,4 +22,6 @@ class Constants {
 	static final String GAME_DIR = "/home/greenbben/Documents/thesis/6.Uap extra/games/";
 	
 	static final long MOVE_MILLIS = 10000;
+	
+	static final int NEURAL_NET_INPUTS = 96;
 }

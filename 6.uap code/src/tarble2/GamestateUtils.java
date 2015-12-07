@@ -3,9 +3,13 @@ package tarble2;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import org.jblas.DoubleMatrix;
+
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
 public class GamestateUtils {
@@ -187,7 +191,7 @@ public class GamestateUtils {
 			if (state.getScore1() > state.getScore2()) {
 				return 1;
 			} 
-			if (state.getTeam2().size() == 0) {
+			if (state.getTeam2().size() == 0 && state.getScore1() == state.getScore2()) {
 				return -1;
 			}
 			return 2;
@@ -211,4 +215,37 @@ public class GamestateUtils {
 				false,
 				new Random().nextInt(Constants.MAX_ROLL) + 1);
 	}
+	
+	/**
+	 * Converts a Gamestate object to a double matrix that can be used as the input to a neural network.
+	 * 
+	 * @param state A Gamestate object representing the current state of the game.
+	 * @return A double matrix representing the gamestate that can be used as the input to a neural network.
+	 */
+	static DoubleMatrix boardToInputs(Gamestate state) {
+		DoubleMatrix ret = DoubleMatrix.zeros(1, Constants.NEURAL_NET_INPUTS);
+		ret.put(0, 95, state.isNeutralPlaced() ? 1 : -1);
+		ret.put(0, 94, state.isPlayer1Turn() ? 1 : -1);
+		ret.put(0, 93, state.getRoll());
+		ret.put(0, 92, state.getScore1());
+		ret.put(0, 91, state.getScore2());
+		for (int i : state.getTeam1()) {
+			ret.put(0, locationToIndex(i), 1);
+		}
+		for (int i : state.getTeam2()) {
+			ret.put(0, locationToIndex(i), -1);
+		}
+		return ret;
+	}
+	
+	/**
+	 * Returns the inde of a location if you count from the bottom lefthand corner of the
+	 * board to the top righthand corner of the board.
+	 */
+	public static int locationToIndex(int location) {
+		int row = location % 100;
+		return row * 6 + columnOffset.get(row) + (location / 100) + Math.min(0, row - 5);
+	}
+	
+	private static final List<Integer> columnOffset = ImmutableList.of(0, 0, 1, 3, 6, 10, 15, 19, 22, 24, 25);
 }
